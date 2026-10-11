@@ -306,13 +306,27 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     const fileUrl = 'https://commons.wikimedia.org/wiki/File:' + c.file;
     $('cat-credit').innerHTML = `кот — <a href="${fileUrl}" target="_blank" rel="noopener">${c.author}</a>, <a href="${c.licUrl}" target="_blank" rel="noopener">${c.lic}</a>`;
   }
-  function setCat(key) {
+  // заранее грузим всех котов, чтобы при смене не мелькал предыдущий
+  const catReady = {};
+  for (const key in CATS) {
+    const pre = new Image();
+    pre.src = `pets/${key}.png`;
+    catReady[key] = pre.decode().catch(() => {});
+  }
+  // два кадра отрисовки; таймер — на случай, когда вкладка в фоне и кадры не рисуются
+  const nextFrame = () => new Promise(r => { requestAnimationFrame(() => requestAnimationFrame(r)); setTimeout(r, 100); });
+
+  async function setCat(key) {
     if (key === catKey) return;
     catKey = key;
     const img = $('cat');
-    if (reduceMotion) { placeCat(key); return; }
     img.classList.add('swap');
-    setTimeout(() => { placeCat(key); img.classList.remove('swap'); }, 350);
+    const fadeOut = reduceMotion ? null : new Promise(r => setTimeout(r, 350));
+    await Promise.all([catReady[key], fadeOut]);
+    if (catKey !== key) return; // пока ждали, погоду уже переключили
+    placeCat(key);
+    await nextFrame(); // даём браузеру отрисовать нового кота, пока он ещё прозрачный
+    if (catKey === key) img.classList.remove('swap');
   }
 
   function renderWeather() {
