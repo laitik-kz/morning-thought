@@ -360,6 +360,10 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     { t: 'Уже не утро? У разработчика утро начинается с первого успешного билда.', tags: ['late'] },
   ];
 
+  const TAG_NAMES = {
+    general: 'общая', clear: 'ясно', cloudy: 'облачно', rain: 'дождь', snow: 'снег', night: 'ночь',
+    mon: 'понедельник', fri: 'пятница', weekend: 'выходной', morning: 'утро', late: 'не_утро',
+  };
   const LABELS = { clear: 'Ясно', cloudy: 'Облачно', rain: 'Дождь', snow: 'Снег' };
   const wmoToKind = c =>
     c <= 1 ? 'clear'
@@ -460,7 +464,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     const q = $('quote');
     const put = () => {
       q.textContent = pick.t;
-      $('qid').textContent = `id = ${String(pick.i + 1).padStart(2, '0')} / ${THOUGHTS.length}`;
+      $('qid').textContent = (pick.tags || ['general']).map(tg => '#' + TAG_NAMES[tg]).join(' ');
     };
     if (!animate || reduceMotion) { put(); return; }
     q.classList.remove('flip-in');
