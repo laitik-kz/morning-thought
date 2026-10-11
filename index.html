@@ -144,8 +144,6 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 
     <div class="flex flex-wrap items-center gap-3">
       <button id="next" type="button" class="btn btn-primary rounded-full px-6 py-3 font-bold">Новая мысль</button>
-      <button id="copy" type="button" class="btn btn-ghost rounded-full px-5 py-3 font-semibold">Копировать</button>
-      <span id="qid" class="mono text-xs text-[color:var(--ink-dim)] ml-auto"></span>
     </div>
 
     <footer class="flex flex-col gap-3 pt-4 border-t border-white/15">
@@ -237,10 +235,6 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     { t: 'Уже не утро? У разработчика утро начинается с первого успешного билда.', tags: ['late'] },
   ];
 
-  const TAG_NAMES = {
-    general: 'общая', clear: 'ясно', cloudy: 'облачно', rain: 'дождь', snow: 'снег', night: 'ночь',
-    mon: 'понедельник', fri: 'пятница', weekend: 'выходной', morning: 'утро', late: 'не_утро',
-  };
   // Коты с Wikimedia Commons. box — границы непрозрачной части картинки [left, top, right, bottom] в пикселях,
   // по ним кот ставится лапами на подоконник. size — видимая высота кота в единицах сцены, drop — насколько опустить ниже.
   const CATS = {
@@ -390,10 +384,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     const pick = pickThought();
     state.current = pick;
     const q = $('quote');
-    const put = () => {
-      q.textContent = pick.t;
-      $('qid').textContent = (pick.tags || ['general']).map(tg => '#' + TAG_NAMES[tg]).join(' ');
-    };
+    const put = () => { q.textContent = pick.t; };
     if (!animate || reduceMotion) { put(); return; }
     q.classList.remove('flip-in');
     q.classList.add('flip-out');
@@ -405,7 +396,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     }, 260);
   }
 
-  // ---------- копирование ----------
+  // ---------- подсказка ----------
   let toastTimer;
   function toast(msg) {
     const el = $('toast');
@@ -413,28 +404,6 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     el.classList.remove('hide');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.add('hide'), 2200);
-  }
-
-  async function copyQuote() {
-    const text = `«${state.current.t}»\n— утренняя мысль разработчика, Алматы`;
-    try {
-      await navigator.clipboard.writeText(text);
-      toast('Скопировано в буфер');
-    } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.cssText = 'position:fixed;opacity:0';
-      document.body.appendChild(ta);
-      ta.select();
-      let ok = false;
-      try { ok = document.execCommand('copy'); } catch (_) {}
-      ta.remove();
-      if (ok) { toast('Скопировано в буфер'); return; }
-      const r = document.createRange();
-      r.selectNodeContents($('quote'));
-      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-      toast('Текст выделен — нажмите Ctrl+C');
-    }
   }
 
   // ---------- эффекты: осадки и частицы ----------
@@ -518,10 +487,6 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     showThought(true);
     burst(...center(e.currentTarget), SUNNY);
     perk($('cat'));
-  });
-  $('copy').addEventListener('click', e => {
-    copyQuote();
-    burst(...center(e.currentTarget), ['#ffffff', '#cfe8ff', '#a5f3c4'], 18);
   });
   {
     const pet = $('cat');
