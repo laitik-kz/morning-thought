@@ -40,37 +40,25 @@ html, body { height: 100%; }
 body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: var(--font-body); overflow-x: hidden; }
 
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
-#scene .sky-top { stop-color: var(--sky-top); transition: stop-color 1.2s; }
-#scene .sky-bottom { stop-color: var(--sky-bottom); transition: stop-color 1.2s; }
-#fx { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-/* что видно при какой погоде */
-.sun, .moon, .stars, .owl, .cat, .clouds, .clouds-heavy { transition: opacity 1s; }
-.moon, .stars, .owl, .clouds-heavy { opacity: 0; }
-:root[data-sky$="-night"] .sun, :root[data-sky$="-night"] .cat { opacity: 0; }
-:root[data-sky$="-night"] .moon, :root[data-sky$="-night"] .owl { opacity: 1; }
-:root[data-sky="clear-night"] .stars { opacity: 1; }
-:root:not([data-sky^="clear"]) .sun, :root:not([data-sky^="clear"]) .moon { opacity: 0; }
-:root[data-sky^="clear"] .clouds { opacity: .55; }
-:root:not([data-sky^="clear"]) .clouds-heavy { opacity: 1; }
-:root[data-sky^="rain"] .clouds, :root[data-sky^="rain"] .clouds-heavy { filter: brightness(.72); }
-.land { transition: filter 1.2s; }
-:root[data-sky$="-night"] .land { filter: brightness(.42) saturate(.7); }
-:root[data-sky^="snow"] .ground { fill: #eef3f7; }
-:root[data-sky$="-night"] .window-light { opacity: 1; }
+/* фото-фон под погоду: плавная смена кадров и медленный наплыв */
+#photo { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--sky-top); }
+#photo .ph { position: absolute; inset: -2%; background-size: cover; background-position: center 45%; opacity: 0; transition: opacity 1.4s ease; animation: kenburns 40s ease-in-out infinite alternate; }
+#photo .ph.on { opacity: 1; }
+#photo .ph[data-kind="rain"] { filter: brightness(.72) saturate(.8); }
+:root[data-sky="snow-night"] #photo .ph[data-kind="snow"] { filter: brightness(.45) saturate(.7); }
+#photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,0) 35%, rgba(0,0,0,.35)); }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08) translate(-1%, -1%); } }
+#scene { z-index: 1; }
+#fx { z-index: 2; }
+.owl, .cat { transition: opacity 1s; }
+.owl { opacity: 0; }
+:root[data-sky$="-night"] .cat { opacity: 0; }
+:root[data-sky$="-night"] .owl { opacity: 1; }
 .window-light { opacity: 0; transition: opacity 1s; }
 
 /* анимации сцены */
-.drift { animation: drift linear infinite; }
-@keyframes drift { from { transform: translateX(-420px); } to { transform: translateX(1900px); } }
-.sun-glow { animation: pulse 6s ease-in-out infinite; transform-origin: 1270px 160px; }
-@keyframes pulse { 50% { transform: scale(1.08); } }
-.twinkle { animation: twinkle 3s ease-in-out infinite; }
-@keyframes twinkle { 50% { opacity: .25; } }
-.tail { transform-origin: 600px 792px; animation: wag 2.4s ease-in-out infinite; }
-@keyframes wag { 50% { transform: rotate(-14deg); } }
-.blink { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
-@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
 .steam path { animation: steam 3s ease-in-out infinite; opacity: 0; }
 .steam path:nth-child(2) { animation-delay: 1s; }
 .steam path:nth-child(3) { animation-delay: 2s; }
@@ -116,105 +104,15 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 </head>
 <body>
 
+<div id="photo" aria-hidden="true">
+  <div class="ph" data-kind="clear" style="background-image:url('photos/clear.jpg')"></div>
+  <div class="ph" data-kind="cloudy" style="background-image:url('photos/cloudy.jpg')"></div>
+  <div class="ph" data-kind="rain" style="background-image:url('photos/rain.jpg')"></div>
+  <div class="ph" data-kind="snow" style="background-image:url('photos/snow.jpg')"></div>
+  <div class="ph" data-kind="night" style="background-image:url('photos/night.jpg')"></div>
+</div>
+
 <svg id="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-  <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop class="sky-top" offset="0"/>
-      <stop class="sky-bottom" offset="1"/>
-    </linearGradient>
-    <radialGradient id="glow">
-      <stop offset="0" stop-color="#fff3c4" stop-opacity=".9"/>
-      <stop offset="1" stop-color="#fff3c4" stop-opacity="0"/>
-    </radialGradient>
-    <symbol id="cloud" viewBox="0 0 300 120">
-      <circle cx="80" cy="75" r="45" fill="#fff"/>
-      <circle cx="140" cy="55" r="55" fill="#fff"/>
-      <circle cx="205" cy="72" r="42" fill="#fff"/>
-      <rect x="60" y="72" width="170" height="46" rx="23" fill="#fff"/>
-    </symbol>
-    <symbol id="cloud-grey" viewBox="0 0 300 120">
-      <circle cx="80" cy="75" r="45" fill="#b7c2cf"/>
-      <circle cx="140" cy="55" r="55" fill="#c7d0da"/>
-      <circle cx="205" cy="72" r="42" fill="#aeb9c6"/>
-      <rect x="60" y="72" width="170" height="46" rx="23" fill="#b7c2cf"/>
-    </symbol>
-  </defs>
-
-  <rect width="1600" height="900" fill="url(#sky)"/>
-
-  <g class="stars" fill="#fff">
-    <circle class="twinkle" cx="120" cy="90" r="2"/>
-    <circle cx="260" cy="160" r="1.5"/>
-    <circle class="twinkle" cx="420" cy="70" r="2.2" style="animation-delay:1s"/>
-    <circle cx="610" cy="140" r="1.4"/>
-    <circle class="twinkle" cx="760" cy="60" r="1.8" style="animation-delay:2s"/>
-    <circle cx="880" cy="190" r="1.5"/>
-    <circle class="twinkle" cx="990" cy="100" r="2" style="animation-delay:.5s"/>
-    <circle cx="1320" cy="80" r="1.6"/>
-    <circle class="twinkle" cx="1460" cy="150" r="2.1" style="animation-delay:1.5s"/>
-    <circle cx="1540" cy="60" r="1.4"/>
-  </g>
-
-  <g class="sun">
-    <circle class="sun-glow" cx="1270" cy="160" r="150" fill="url(#glow)"/>
-    <foreignObject class="sun-anim" id="sun" x="1170" y="60" width="200" height="200"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="sun"></div></foreignObject>
-  </g>
-  <g class="moon">
-    <circle cx="1270" cy="160" r="110" fill="url(#glow)" opacity=".35"/>
-    <circle cx="1270" cy="160" r="48" fill="#f3efe0"/>
-    <circle cx="1292" cy="146" r="44" style="fill:var(--sky-top)"/>
-  </g>
-
-  <g class="land">
-    <!-- Заилийский Алатау -->
-    <path fill="#6f86a6" d="M0 560 L120 470 L210 520 L330 400 L430 480 L560 360 L690 470 L800 420 L930 330 L1060 450 L1180 380 L1300 470 L1420 400 L1600 500 L1600 900 L0 900Z"/>
-    <g fill="#f4f7fb">
-      <path d="M296 426 L330 400 L366 428 L348 424 L332 436 L314 422Z"/>
-      <path d="M522 390 L560 360 L600 392 L580 386 L562 400 L542 386Z"/>
-      <path d="M890 362 L930 330 L972 364 L950 358 L932 372 L912 356Z"/>
-      <path d="M1146 406 L1180 380 L1216 408 L1198 402 L1182 414 L1164 402Z"/>
-      <path d="M1390 424 L1420 400 L1452 426 L1436 422 L1420 432 L1406 420Z"/>
-    </g>
-    <path fill="#4f6b5c" d="M0 680 Q200 600 400 660 T800 650 T1200 630 T1600 660 L1600 900 L0 900Z"/>
-    <!-- Кок-Тобе -->
-    <g fill="#3d4f5e">
-      <path d="M1080 640 Q1130 585 1200 600 Q1250 610 1280 650Z"/>
-      <rect x="1166" y="470" width="8" height="140"/>
-      <path d="M1160 520 L1180 520 L1176 540 L1164 540Z"/>
-      <rect x="1169" y="440" width="2" height="32"/>
-    </g>
-    <!-- город -->
-    <g fill="#33424f">
-      <rect x="0" y="720" width="70" height="90"/><rect x="80" y="690" width="50" height="120"/>
-      <rect x="140" y="735" width="90" height="75"/><rect x="240" y="660" width="44" height="150"/>
-      <rect x="295" y="710" width="80" height="100"/><rect x="390" y="745" width="70" height="65"/>
-      <rect x="470" y="700" width="48" height="110"/><rect x="760" y="728" width="80" height="82"/>
-      <rect x="850" y="690" width="40" height="120"/><rect x="900" y="740" width="90" height="70"/>
-      <rect x="1000" y="705" width="60" height="105"/><rect x="1240" y="725" width="70" height="85"/>
-      <rect x="1320" y="680" width="46" height="130"/><rect x="1380" y="738" width="100" height="72"/>
-      <rect x="1490" y="700" width="110" height="110"/>
-    </g>
-    <g class="window-light" fill="#ffd98a">
-      <rect x="92" y="705" width="8" height="10"/><rect x="110" y="740" width="8" height="10"/>
-      <rect x="252" y="690" width="8" height="10"/><rect x="264" y="730" width="8" height="10"/>
-      <rect x="862" y="712" width="8" height="10"/><rect x="1015" y="725" width="8" height="10"/>
-      <rect x="1333" y="700" width="8" height="10"/><rect x="1345" y="745" width="8" height="10"/>
-      <rect x="1510" y="725" width="8" height="10"/>
-    </g>
-    <rect class="ground" x="0" y="800" width="1600" height="20" fill="#3e5648"/>
-  </g>
-
-  <g class="clouds">
-    <g class="drift" style="animation-duration:90s;animation-delay:-20s"><use href="#cloud" x="0" y="120" width="260" height="104"/></g>
-    <g class="drift" style="animation-duration:120s;animation-delay:-70s"><use href="#cloud" x="0" y="220" width="200" height="80"/></g>
-  </g>
-  <g class="clouds-heavy">
-    <g class="drift" style="animation-duration:70s;animation-delay:-10s"><use href="#cloud-grey" x="0" y="60" width="420" height="168"/></g>
-    <g class="drift" style="animation-duration:85s;animation-delay:-40s"><use href="#cloud-grey" x="0" y="150" width="360" height="144"/></g>
-    <g class="drift" style="animation-duration:100s;animation-delay:-65s"><use href="#cloud-grey" x="0" y="40" width="480" height="192"/></g>
-    <g class="drift" style="animation-duration:78s;animation-delay:-55s"><use href="#cloud" x="0" y="190" width="300" height="120"/></g>
-  </g>
-
   <!-- подоконник -->
   <rect x="0" y="818" width="1600" height="82" style="fill:var(--sill)"/>
   <rect x="0" y="818" width="1600" height="8" fill="#8a5a3f"/>
@@ -377,6 +275,9 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     }
     state.scene = { kind, day };
     document.documentElement.dataset.sky = `${kind}-${day ? 'day' : 'night'}`;
+    // ночью — ночное фото, кроме снега и дождя: у них свои кадры, затемнённые фильтром
+    const photo = !day && (kind === 'clear' || kind === 'cloudy') ? 'night' : kind;
+    document.querySelectorAll('#photo .ph').forEach(p => p.classList.toggle('on', p.dataset.kind === photo));
     setPrecip(kind);
   }
 
