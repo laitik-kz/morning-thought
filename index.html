@@ -593,7 +593,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
   });
   for (const pet of [$('cat'), $('owl')]) {
     const pat = () => { perk(pet); burst(...center(pet), ['#ff7aa2', '#ffd1dc', '#ffffff'], 16); toast(pet.id === 'cat' ? 'Мррр… коммить смелее' : 'Угу. Сначала сон, потом деплой'); };
-    pet.addEventListener('click', pat);
+    pet.addEventListener('click', e => { pat(); if (e.detail) pet.blur(); }); // мышь — без рамки фокуса, Tab — с рамкой
     pet.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pat(); } });
   }
   document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
