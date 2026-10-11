@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script src="anim/data.js"></script>
 <style>
 /* Layout: окно в Алматы — живая SVG-сцена на весь экран, по центру стеклянная карточка с мыслью.
    Единый «оконный» мир: цвета задаёт погода и время суток, а не тема ОС. */
@@ -61,7 +63,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 /* анимации сцены */
 .drift { animation: drift linear infinite; }
 @keyframes drift { from { transform: translateX(-420px); } to { transform: translateX(1900px); } }
-.sun-glow { animation: pulse 6s ease-in-out infinite; transform-origin: 1150px 170px; }
+.sun-glow { animation: pulse 6s ease-in-out infinite; transform-origin: 1270px 160px; }
 @keyframes pulse { 50% { transform: scale(1.08); } }
 .twinkle { animation: twinkle 3s ease-in-out infinite; }
 @keyframes twinkle { 50% { opacity: .25; } }
@@ -73,6 +75,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 .steam path:nth-child(2) { animation-delay: 1s; }
 .steam path:nth-child(3) { animation-delay: 2s; }
 @keyframes steam { 0% { opacity: 0; transform: translateY(8px); } 40% { opacity: .7; } 100% { opacity: 0; transform: translateY(-22px); } }
+.lottie-box { width: 100%; height: 100%; }
 .pet { cursor: pointer; }
 :root:not([data-sky$="-night"]) .owl, :root[data-sky$="-night"] .cat { pointer-events: none; visibility: hidden; transition: visibility 0s 1s; }
 .pet.perk { animation: perk .6s ease; transform-box: fill-box; transform-origin: bottom center; }
@@ -153,13 +156,13 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
   </g>
 
   <g class="sun">
-    <circle class="sun-glow" cx="1150" cy="170" r="150" fill="url(#glow)"/>
-    <circle cx="1150" cy="170" r="58" fill="#ffe08a"/>
+    <circle class="sun-glow" cx="1270" cy="160" r="150" fill="url(#glow)"/>
+    <foreignObject class="sun-anim" id="sun" x="1170" y="60" width="200" height="200"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="sun"></div></foreignObject>
   </g>
   <g class="moon">
-    <circle cx="1150" cy="170" r="110" fill="url(#glow)" opacity=".35"/>
-    <circle cx="1150" cy="170" r="48" fill="#f3efe0"/>
-    <circle cx="1172" cy="156" r="44" style="fill:var(--sky-top)"/>
+    <circle cx="1270" cy="160" r="110" fill="url(#glow)" opacity=".35"/>
+    <circle cx="1270" cy="160" r="48" fill="#f3efe0"/>
+    <circle cx="1292" cy="146" r="44" style="fill:var(--sky-top)"/>
   </g>
 
   <g class="land">
@@ -216,33 +219,9 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
   <rect x="0" y="818" width="1600" height="82" style="fill:var(--sill)"/>
   <rect x="0" y="818" width="1600" height="8" fill="#8a5a3f"/>
 
-  <!-- котик (день) -->
-  <g class="cat pet" id="cat" tabindex="0" role="button" aria-label="Погладить котика">
-    <path class="tail" d="M600 800 Q540 790 548 740 Q552 712 574 716" fill="none" stroke="#e08a45" stroke-width="16" stroke-linecap="round"/>
-    <ellipse cx="660" cy="780" rx="70" ry="42" fill="#e8924a"/>
-    <ellipse cx="660" cy="792" rx="44" ry="22" fill="#f6c08e"/>
-    <path d="M690 700 L700 668 L716 696Z" fill="#e8924a"/>
-    <path d="M736 696 L752 668 L758 702Z" fill="#e8924a"/>
-    <circle cx="724" cy="722" r="36" fill="#e8924a"/>
-    <ellipse class="blink" cx="711" cy="718" rx="5" ry="7" fill="#2a2a2a"/>
-    <ellipse class="blink" cx="738" cy="718" rx="5" ry="7" fill="#2a2a2a"/>
-    <path d="M720 732 L728 732 L724 737Z" fill="#c4553f"/>
-    <path d="M700 734 L680 730 M700 738 L682 740 M748 734 L768 730 M748 738 L766 740" stroke="#7a4a2a" stroke-width="1.5"/>
-    <path d="M606 808 Q660 822 716 808" stroke="#c9763a" stroke-width="10" fill="none" stroke-linecap="round"/>
-  </g>
-
-  <!-- сова (ночь) -->
-  <g class="owl pet" id="owl" tabindex="0" role="button" aria-label="Погладить сову">
-    <ellipse cx="680" cy="760" rx="50" ry="62" fill="#8a6a4f"/>
-    <ellipse cx="680" cy="782" rx="32" ry="36" fill="#c9ab8a"/>
-    <path d="M640 708 L648 680 L664 706Z M696 706 L712 680 L720 708Z" fill="#8a6a4f"/>
-    <circle cx="662" cy="730" r="18" fill="#f8f3e6"/>
-    <circle cx="698" cy="730" r="18" fill="#f8f3e6"/>
-    <circle class="blink" cx="662" cy="731" r="8" fill="#1f1a14"/>
-    <circle class="blink" cx="698" cy="731" r="8" fill="#1f1a14"/>
-    <path d="M674 744 L686 744 L680 756Z" fill="#e0a43a"/>
-    <path d="M662 818 l-6 6 M668 818 v8 M692 818 v8 M698 818 l6 6" stroke="#e0a43a" stroke-width="3" stroke-linecap="round"/>
-  </g>
+  <!-- котик (день) и сова (ночь): анимации LottieFiles -->
+  <foreignObject class="cat pet" id="cat" x="530" y="578" width="300" height="300" tabindex="0" role="button" aria-label="Погладить котика"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="cat"></div></foreignObject>
+  <foreignObject class="owl pet" id="owl" x="555" y="632" width="260" height="200" tabindex="0" role="button" aria-label="Погладить сову"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="owl"></div></foreignObject>
 
   <!-- кружка кофе -->
   <g>
@@ -578,12 +557,23 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     requestAnimationFrame(frame);
   }
 
+  // ---------- Lottie: котик, сова, солнце ----------
+  const anims = {};
+  if (window.lottie && window.LOTTIE) {
+    document.querySelectorAll('[data-anim]').forEach(box => {
+      const name = box.dataset.anim;
+      anims[name] = lottie.loadAnimation({ container: box, renderer: 'svg', loop: true, autoplay: !reduceMotion, animationData: window.LOTTIE[name] });
+    });
+  }
+
   // ---------- события ----------
   const center = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
   const SUNNY = ['#ffd166', '#fff3c4', '#ff9f6e', '#ffffff'];
 
   function perk(el) {
     el.classList.remove('perk'); void el.getBoundingClientRect(); el.classList.add('perk');
+    const a = anims[el.id];
+    if (a && !reduceMotion) { a.setSpeed(2.5); setTimeout(() => a.setSpeed(1), 1200); }
   }
 
   $('next').addEventListener('click', e => {
