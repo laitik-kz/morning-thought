@@ -8,8 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-<script src="anim/data.js"></script>
 <style>
 /* Layout: окно в Алматы — живая SVG-сцена на весь экран, по центру стеклянная карточка с мыслью.
    Единый «оконный» мир: цвета задаёт погода и время суток, а не тема ОС. */
@@ -52,10 +50,18 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 @keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08) translate(-1%, -1%); } }
 #scene { z-index: 1; }
 #fx { z-index: 2; }
-.owl, .cat { transition: opacity 1s; }
-.owl { opacity: 0; }
-:root[data-sky$="-night"] .cat { opacity: 0; }
-:root[data-sky$="-night"] .owl { opacity: 1; }
+.cat { transition: filter 1.2s; transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 4.5s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.012, 1.022); } }
+:root[data-sky$="-night"] .cat { filter: brightness(.55) saturate(.8); }
+.owl-fly { opacity: 0; transition: opacity 1s; animation: fly 18s linear infinite; }
+:root[data-sky$="-night"] .owl-fly { opacity: 1; }
+@keyframes fly {
+  0% { transform: translate(-320px, 40px); }
+  15% { transform: translate(200px, 0); }
+  30% { transform: translate(720px, 50px); }
+  45% { transform: translate(1240px, 0); }
+  60%, 100% { transform: translate(1900px, 30px); }
+}
 .window-light { opacity: 0; transition: opacity 1s; }
 
 /* анимации сцены */
@@ -63,11 +69,11 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 .steam path:nth-child(2) { animation-delay: 1s; }
 .steam path:nth-child(3) { animation-delay: 2s; }
 @keyframes steam { 0% { opacity: 0; transform: translateY(8px); } 40% { opacity: .7; } 100% { opacity: 0; transform: translateY(-22px); } }
-.lottie-box { width: 100%; height: 100%; }
 .pet { cursor: pointer; }
-:root:not([data-sky$="-night"]) .owl, :root[data-sky$="-night"] .cat { pointer-events: none; visibility: hidden; transition: visibility 0s 1s; }
-.pet.perk { animation: perk .6s ease; transform-box: fill-box; transform-origin: bottom center; }
-@keyframes perk { 30% { transform: translateY(-14px) rotate(-4deg); } 60% { transform: translateY(0) rotate(3deg); } }
+:root:not([data-sky$="-night"]) .owl { pointer-events: none; }
+.pet.perk { animation: perk .7s ease; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes perk { 40% { transform: scale(1.06, .96); } 70% { transform: scale(.99, 1.02); } }
+#credits a { text-decoration: underline; text-underline-offset: 2px; }
 
 /* стеклянная карточка */
 .glass {
@@ -113,16 +119,34 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 </div>
 
 <svg id="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c49a6c"/>
+      <stop offset=".12" stop-color="#a77b52"/>
+      <stop offset="1" stop-color="#6e4b30"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-200%" width="140%" height="500%"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
   <!-- подоконник -->
-  <rect x="0" y="818" width="1600" height="82" style="fill:var(--sill)"/>
-  <rect x="0" y="818" width="1600" height="8" fill="#8a5a3f"/>
+  <rect x="0" y="818" width="1600" height="82" fill="url(#wood)"/>
+  <g stroke="#5a3b24" stroke-opacity=".25" fill="none">
+    <path d="M0 842 C300 838 520 848 820 842 S1300 836 1600 844"/>
+    <path d="M0 866 C260 872 600 860 900 868 S1350 874 1600 864"/>
+    <path d="M0 888 C380 884 700 892 1050 886 S1450 882 1600 890"/>
+  </g>
+  <rect x="0" y="818" width="1600" height="3" fill="#e2c49b" opacity=".6"/>
 
-  <!-- котик (день) и сова (ночь): анимации LottieFiles -->
-  <foreignObject class="cat pet" id="cat" x="530" y="578" width="300" height="300" tabindex="0" role="button" aria-label="Погладить котика"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="cat"></div></foreignObject>
-  <foreignObject class="owl pet" id="owl" x="555" y="632" width="260" height="200" tabindex="0" role="button" aria-label="Погладить сову"><div xmlns="http://www.w3.org/1999/xhtml" class="lottie-box" data-anim="owl"></div></foreignObject>
+  <!-- сова-сипуха пролетает ночью (фото: Peter Trimming, CC BY 2.0) -->
+  <g class="owl-fly">
+    <image class="owl pet" id="owl" href="pets/owl.png" x="0" y="150" width="260" height="89" tabindex="0" role="button" aria-label="Сова пролетает"/>
+  </g>
+
+  <!-- кот (фото: V. Sauvaget, CC BY-SA 4.0) -->
+  <ellipse cx="680" cy="823" rx="170" ry="10" fill="#000" opacity=".4" filter="url(#soft)"/>
+  <image class="cat pet" id="cat" href="pets/cat.png" x="480" y="586" width="420" height="304" tabindex="0" role="button" aria-label="Погладить кота"/>
 
   <!-- кружка кофе -->
-  <g>
+  <g transform="translate(150 0)">
     <g class="steam" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
       <path d="M930 760 q-8 -12 0 -24 q8 -12 0 -24"/>
       <path d="M946 762 q-8 -12 0 -24 q8 -12 0 -24"/>
@@ -169,6 +193,12 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     </footer>
   </article>
 </main>
+
+<footer id="credits" class="fixed bottom-1 right-3 left-3 z-20 text-right text-[10px] leading-tight text-white/70">
+  Фото: Алматы — Unsplash (Ilyas Dautov, Michael Starkie, Nursultan Abakirov, Nursultan Rakysh, Abraham Kabdrashit) ·
+  кот — <a href="https://commons.wikimedia.org/wiki/File:Brown_spotted_tabby_bengal_cat_2.png" target="_blank" rel="noopener">V. Sauvaget</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank" rel="noopener">CC BY-SA 4.0</a> ·
+  сова — <a href="https://commons.wikimedia.org/wiki/File:Tyto_alba_-British_Wildlife_Centre,_Surrey,_England_-flying-8a_(transparent).png" target="_blank" rel="noopener">Peter Trimming</a>, <a href="https://creativecommons.org/licenses/by/2.0" target="_blank" rel="noopener">CC BY 2.0</a>
+</footer>
 
 <div id="toast" role="status" aria-live="polite" class="hide glass fixed left-1/2 bottom-8 z-20 -translate-x-1/2 rounded-full px-5 py-2 text-sm font-semibold"></div>
 
@@ -458,29 +488,18 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     requestAnimationFrame(frame);
   }
 
-  // ---------- Lottie: котик, сова, солнце ----------
-  const anims = {};
-  if (window.lottie && window.LOTTIE) {
-    document.querySelectorAll('[data-anim]').forEach(box => {
-      const name = box.dataset.anim;
-      anims[name] = lottie.loadAnimation({ container: box, renderer: 'svg', loop: true, autoplay: !reduceMotion, animationData: window.LOTTIE[name] });
-    });
-  }
-
   // ---------- события ----------
   const center = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
   const SUNNY = ['#ffd166', '#fff3c4', '#ff9f6e', '#ffffff'];
 
   function perk(el) {
     el.classList.remove('perk'); void el.getBoundingClientRect(); el.classList.add('perk');
-    const a = anims[el.id];
-    if (a && !reduceMotion) { a.setSpeed(2.5); setTimeout(() => a.setSpeed(1), 1200); }
   }
 
   $('next').addEventListener('click', e => {
     showThought(true);
     burst(...center(e.currentTarget), SUNNY);
-    perk(state.scene.day ? $('cat') : $('owl'));
+    perk($('cat'));
   });
   $('copy').addEventListener('click', e => {
     copyQuote();
