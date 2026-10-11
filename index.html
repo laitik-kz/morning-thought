@@ -53,24 +53,10 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 .cat { transition: filter 1.2s; transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 4.5s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: scale(1.012, 1.022); } }
 :root[data-sky$="-night"] .cat { filter: brightness(.55) saturate(.8); }
-.owl-fly { opacity: 0; transition: opacity 1s; animation: fly 18s linear infinite; }
-:root[data-sky$="-night"] .owl-fly { opacity: 1; }
-@keyframes fly {
-  0% { transform: translate(-320px, 40px); }
-  15% { transform: translate(200px, 0); }
-  30% { transform: translate(720px, 50px); }
-  45% { transform: translate(1240px, 0); }
-  60%, 100% { transform: translate(1900px, 30px); }
-}
 .window-light { opacity: 0; transition: opacity 1s; }
 
 /* анимации сцены */
-.steam path { animation: steam 3s ease-in-out infinite; opacity: 0; }
-.steam path:nth-child(2) { animation-delay: 1s; }
-.steam path:nth-child(3) { animation-delay: 2s; }
-@keyframes steam { 0% { opacity: 0; transform: translateY(8px); } 40% { opacity: .7; } 100% { opacity: 0; transform: translateY(-22px); } }
 .pet { cursor: pointer; }
-:root:not([data-sky$="-night"]) .owl { pointer-events: none; }
 .pet.perk { animation: perk .7s ease; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes perk { 40% { transform: scale(1.06, .96); } 70% { transform: scale(.99, 1.02); } }
 #credits a { text-decoration: underline; text-underline-offset: 2px; }
@@ -136,26 +122,10 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
   </g>
   <rect x="0" y="818" width="1600" height="3" fill="#e2c49b" opacity=".6"/>
 
-  <!-- сова-сипуха пролетает ночью (фото: Peter Trimming, CC BY 2.0) -->
-  <g class="owl-fly">
-    <image class="owl pet" id="owl" href="pets/owl.png" x="0" y="150" width="260" height="89" tabindex="0" role="button" aria-label="Сова пролетает"/>
-  </g>
-
   <!-- кот (фото: V. Sauvaget, CC BY-SA 4.0) -->
-  <ellipse cx="680" cy="823" rx="170" ry="10" fill="#000" opacity=".4" filter="url(#soft)"/>
-  <image class="cat pet" id="cat" href="pets/cat.png" x="480" y="586" width="420" height="304" tabindex="0" role="button" aria-label="Погладить кота"/>
+  <ellipse cx="680" cy="846" rx="170" ry="10" fill="#000" opacity=".4" filter="url(#soft)"/>
+  <image class="cat pet" id="cat" href="pets/cat.png" x="480" y="612" width="420" height="304" tabindex="0" role="button" aria-label="Погладить кота"/>
 
-  <!-- кружка кофе -->
-  <g transform="translate(150 0)">
-    <g class="steam" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
-      <path d="M930 760 q-8 -12 0 -24 q8 -12 0 -24"/>
-      <path d="M946 762 q-8 -12 0 -24 q8 -12 0 -24"/>
-      <path d="M962 760 q-8 -12 0 -24 q8 -12 0 -24"/>
-    </g>
-    <rect x="914" y="770" width="64" height="50" rx="8" fill="#f1ece4"/>
-    <path d="M978 782 q22 0 22 16 q0 16 -22 16" fill="none" stroke="#f1ece4" stroke-width="8"/>
-    <text x="946" y="801" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#6b4430">{ }</text>
-  </g>
 </svg>
 
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -196,8 +166,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 
 <footer id="credits" class="fixed bottom-1 right-3 left-3 z-20 text-right text-[10px] leading-tight text-white/70">
   Фото: Алматы — Unsplash (Ilyas Dautov, Michael Starkie, Nursultan Abakirov, Nursultan Rakysh, Abraham Kabdrashit) ·
-  кот — <a href="https://commons.wikimedia.org/wiki/File:Brown_spotted_tabby_bengal_cat_2.png" target="_blank" rel="noopener">V. Sauvaget</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank" rel="noopener">CC BY-SA 4.0</a> ·
-  сова — <a href="https://commons.wikimedia.org/wiki/File:Tyto_alba_-British_Wildlife_Centre,_Surrey,_England_-flying-8a_(transparent).png" target="_blank" rel="noopener">Peter Trimming</a>, <a href="https://creativecommons.org/licenses/by/2.0" target="_blank" rel="noopener">CC BY 2.0</a>
+  кот — <a href="https://commons.wikimedia.org/wiki/File:Brown_spotted_tabby_bengal_cat_2.png" target="_blank" rel="noopener">V. Sauvaget</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0" target="_blank" rel="noopener">CC BY-SA 4.0</a>
 </footer>
 
 <div id="toast" role="status" aria-live="polite" class="hide glass fixed left-1/2 bottom-8 z-20 -translate-x-1/2 rounded-full px-5 py-2 text-sm font-semibold"></div>
@@ -505,8 +474,9 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     copyQuote();
     burst(...center(e.currentTarget), ['#ffffff', '#cfe8ff', '#a5f3c4'], 18);
   });
-  for (const pet of [$('cat'), $('owl')]) {
-    const pat = () => { perk(pet); burst(...center(pet), ['#ff7aa2', '#ffd1dc', '#ffffff'], 16); toast(pet.id === 'cat' ? 'Мррр… коммить смелее' : 'Угу. Сначала сон, потом деплой'); };
+  {
+    const pet = $('cat');
+    const pat = () => { perk(pet); burst(...center(pet), ['#ff7aa2', '#ffd1dc', '#ffffff'], 16); toast('Мррр… коммить смелее'); };
     pet.addEventListener('click', e => { pat(); if (e.detail) pet.blur(); }); // мышь — без рамки фокуса, Tab — с рамкой
     pet.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pat(); } });
   }
