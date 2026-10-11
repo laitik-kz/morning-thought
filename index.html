@@ -404,7 +404,9 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     const hhmm = w.time.slice(11, 16);
     $('wsource').textContent = state.weather
       ? `Open-Meteo, сейчас ${hhmm}`
-      : `снимок на 11.10 ${hhmm}, нет связи с API`;
+      : location.protocol === 'file:'
+        ? `снимок на 11.10 ${hhmm}: нет интернета или API не ответил`
+        : `снимок на 11.10 ${hhmm}: здесь живая погода закрыта, она работает в файле`;
   }
 
   async function loadWeather() {
