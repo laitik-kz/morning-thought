@@ -242,9 +242,9 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     mon: 'понедельник', fri: 'пятница', weekend: 'выходной', morning: 'утро', late: 'не_утро',
   };
   // Коты с Wikimedia Commons. box — границы непрозрачной части картинки [left, top, right, bottom] в пикселях,
-  // по ним кот ставится лапами на подоконник. size — видимая высота кота в единицах сцены.
+  // по ним кот ставится лапами на подоконник. size — видимая высота кота в единицах сцены, drop — насколько опустить ниже.
   const CATS = {
-    clear:  { w: 968, h: 700, box: [7, 151, 959, 548], size: 172, author: 'V. Sauvaget', file: 'Brown_spotted_tabby_bengal_cat_2.png', lic: 'CC BY-SA 4.0', licUrl: 'https://creativecommons.org/licenses/by-sa/4.0' },
+    clear:  { w: 968, h: 700, box: [7, 151, 959, 548], size: 172, drop: 24, author: 'V. Sauvaget', file: 'Brown_spotted_tabby_bengal_cat_2.png', lic: 'CC BY-SA 4.0', licUrl: 'https://creativecommons.org/licenses/by-sa/4.0' },
     cloudy: { w: 960, h: 920, box: [16, 5, 904, 915], size: 205, author: 'Painjet', file: 'Cat_named_Pipi_(2).png', lic: 'CC BY 4.0', licUrl: 'https://creativecommons.org/licenses/by/4.0' },
     rain:   { w: 557, h: 824, box: [25, 20, 556, 803], size: 210, author: 'Heikki Siltala (catza.net)', file: 'EUR_cat_transparent.png', lic: 'CC BY-SA 4.0', licUrl: 'https://creativecommons.org/licenses/by-sa/4.0' },
     snow:   { w: 463, h: 539, box: [61, 15, 461, 538], size: 195, author: 'Gfeissweet', file: 'Garfield,_My_cat_with_no_background.png', lic: 'CC BY-SA 4.0', licUrl: 'https://creativecommons.org/licenses/by-sa/4.0' },
@@ -301,7 +301,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
     img.setAttribute('width', c.w * k);
     img.setAttribute('height', c.h * k);
     img.setAttribute('x', CAT_CX - (l + r) / 2 * k);
-    img.setAttribute('y', SILL_Y - b * k);
+    img.setAttribute('y', SILL_Y + (c.drop || 0) - b * k);
     $('cat-shadow').setAttribute('rx', (r - l) * k * 0.45);
     const fileUrl = 'https://commons.wikimedia.org/wiki/File:' + c.file;
     $('cat-credit').innerHTML = `кот — <a href="${fileUrl}" target="_blank" rel="noopener">${c.author}</a>, <a href="${c.licUrl}" target="_blank" rel="noopener">${c.lic}</a>`;
@@ -542,6 +542,7 @@ body { margin: 0; background: var(--sky-top); color: var(--ink); font-family: va
 
   // ---------- старт ----------
   resize();
+  placeCat(catKey);
   $('today').textContent = almatyParts().label;
   renderWeather();
   applyScene();
